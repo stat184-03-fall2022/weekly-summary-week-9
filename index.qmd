@@ -1,31 +1,74 @@
 ---
-title: "Template Quarto Document"
+title: "Weekly Summary Template"
 author: "Author Name"
 title-block-banner: true
 title-block-style: default
+toc: true
 format: html
 # format: pdf
 ---
 
+## Tuesday, Jan 17
 
-This is a template quarto document.
+::: {.callout-important}
+## TIL
 
-This is an `R` cell
+Include a _very brief_ summary of what you learnt in this class. 
 
-```{R}
-#| fig-subcap: "This is the figure subcaption"
-#| fig-align: "center"
-#| fig-cap-location: top
+Today, I learnt the following concepts in class:
 
-renv::activate()
+1. Item 1
+1. Item 2
+1. Item 3
+:::
+
+Provide more concrete details here. You can also use footenotes[^footnote] if you like
+
+```{R results='hide'}
+#| output: false
 library(dplyr)
-x <- rnorm(100)
-x %>% 
-list(data=., mean=mean(.), sd=sd(.))
+library(purrr)
 ```
 
-And this is a $\TeX$ block
 
-$$
-\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i
-$$
+For example: 
+in class we learnt we learnt about the `map` function from the `purrr` package. 
+
+
+```{R results='hide'}
+par(mfrow=c(3,3))
+map(1:9, function(i)rnorm(1000) %>% hist(., main=i, col=i))
+```
+
+
+
+## Thursday, Jan 19
+
+
+
+::: {.callout-important}
+## TIL
+
+Include a _very brief_ summary of what you learnt in this class. 
+
+Today, I learnt the following concepts in class:
+
+1. Item 1
+1. Item 2
+1. Item 3
+:::
+
+Provide more concrete details here, e.g., 
+
+In class we learnt how to use the `map` function to create multiple regression diagnostic plots
+
+```{R results='hide'}
+par(mfrow=c(3,2))
+mtcars %>%
+  split(.$cyl) %>%
+  map(~ lm(mpg ~ wt, data = .x)) %>%
+  map(function(x)plot(x, which=c(1,2)))
+```
+
+
+[^footnote]: You can include some footnotes here
