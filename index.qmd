@@ -8,12 +8,14 @@ format: html
 # format: pdf
 ---
 
+---
+
 ## Tuesday, Jan 17
 
 ::: {.callout-important}
 ## TIL
 
-Include a _very brief_ summary of what you learnt in this class. 
+Include a _very brief_ summary of what you learnt in this class here. 
 
 Today, I learnt the following concepts in class:
 
@@ -35,8 +37,8 @@ For example:
 in class we learnt we learnt about the `map` function from the `purrr` package. 
 
 
-```{R results='hide'}
-par(mfrow=c(3,3))
+```{R results='hide', fig.width=7, fig.height=7}
+par(mfrow=c(3, 3), mar=c(3.5, 3.5, 2, 1), mgp=c(2.4, 0.8, 0))
 map(1:9, function(i)rnorm(1000) %>% hist(., main=i, col=i))
 ```
 
@@ -49,7 +51,7 @@ map(1:9, function(i)rnorm(1000) %>% hist(., main=i, col=i))
 ::: {.callout-important}
 ## TIL
 
-Include a _very brief_ summary of what you learnt in this class. 
+Include a _very brief_ summary of what you learnt in this class here. 
 
 Today, I learnt the following concepts in class:
 
@@ -62,12 +64,12 @@ Provide more concrete details here, e.g.,
 
 In class we learnt how to use the `map` function to create multiple regression diagnostic plots
 
-```{R results='hide'}
-par(mfrow=c(3,2))
+```{R results='hide', fig.height=4}
+par(mfcol=c(2, 3), mar=c(3.5, 3.5, 2, 1), mgp=c(2.4, 0.8, 0))
 mtcars %>%
   split(.$cyl) %>%
   map(~ lm(mpg ~ wt, data = .x)) %>%
-  map(function(x)plot(x, which=c(1,2)))
+  map(function(x)plot(x, which=c(1, 2)))
 ```
 
 
