@@ -1,6 +1,6 @@
 ---
-title: "Weekly Summary Template"
-author: "Author Name"
+title: "Weekly Summary Week 9"
+author: "Jack Benadon"
 title-block-banner: true
 title-block-style: default
 toc: true
@@ -19,28 +19,103 @@ Include a _very brief_ summary of what you learnt in this class here.
 
 Today, I learnt the following concepts in class:
 
-1. Item 1
-1. Item 2
-1. Item 3
+1. Recap of last class, using the torch package
+1. Decision boundary
+1. Multinomial logistical regression
 :::
 
 Provide more concrete details here. You can also use footenotes[^footnote] if you like
 
-```{R results='hide'}
-#| output: false
+```{R}
 library(dplyr)
 library(purrr)
+library(glmnet)
+library(torch)
+library(ISLR2)
+library(tidyr)
+library(readr)
+library(caret)
+library(mlbench)
+library(nnet)
+```
+
+### Logistic loss function using the torch library
+also known as Binary cross entropy
+
+```{R}
+nn_bce_loss()
 ```
 
 
-For example: 
-in class we learnt we learnt about the `map` function from the `purrr` package. 
+### Some more things about classification:
+#### Decision boundary
+The decision boundary is a line that 
+```{R}
+library(class) 
 
-
-```{R results='hide', fig.width=7, fig.height=7}
-par(mfrow=c(3, 3), mar=c(3.5, 3.5, 2, 1), mgp=c(2.4, 0.8, 0))
-map(1:9, function(i)rnorm(1000) %>% hist(., main=i, col=i))
+X <- t(replicate(200, runif(2)))
+y <- ifelse(apply(X,1,\(x)sum(x^1.5)) + 0.2 *rnorm(200) <= 1, 0, 1) %>% as.factor()
+col <- ifelse(y== 0,"blue", "red")
+plot(X[,1], X[,2], col=col)
 ```
+
+```{R}
+df <- data.frame(y=y, x1=X[,1], x2=X[,2])
+model <- glm(y~., df, family=binomial())
+summary(model)
+```
+
+```{R}
+xnew <- data.frame(
+  x1 = rep(seq(0,1,length.out=50),50),
+  x2 = rep(seq(0,1,length.out=50), each = 50)
+)
+
+prob <- predict(model, xnew, type = 'response')
+decision <- ifelse(prob < 0.5, "blue", "red" )
+
+plot(xnew[,1], xnew[,2], col = decision, pch = 22)
+points(X[,1], X[,2], col = col, pch = 20)
+        
+```
+
+#### Confusion matrix
+
+```{R}
+idx <- sample(1:nrow(df),50)
+train <- df[-idx, ]
+test <- df[idx, ]
+
+model <- glm(y~., train, family=binomial())
+probs <- predict(model, test, type="response")
+
+predicted <- ifelse(probs < 0.5, 0,1)
+expected <- test$y
+
+table(predicted, expected)
+
+```
+the output is a 2x2 table of a binary classification problem. The 0 in the rows are the predictions that we're generating. So out of 37 people the model correctly predicted 33 of them. It gave 4 wrong predictions out of the 37. And in class 1 out of the 13 people 10 of them were correctly predicted to be in class 1. and in 3 cases it wrongly predicted class 0 when it should have been class 1.
+
+```{R}
+caret::confusionMatrix(data=as.factor(predicted), reference=as.factor(expected))
+```
+
+In this case its straight forward because there are just 2 classes. Its deciding between 0 and 1. How would we do if we had 3 different classes?
+
+### Multinomial logistic regression
+
+#### Softmax function
+Similar to the sigmoid function in logistc regression, for multinomial logistic regression we use the softmax function.
+
+$$
+\text{soft-max}(x_1, x_2, \dots, x_k) =(\frac{e^x_1}{\sum^k e^x)},\frac{e^x_2}{\sum^k e^x_i},\dots ,\frac{e^x_k}{\sum^k e^x_i}) = 1
+$$
+
+Soft-max() can be interpreted as the probabilities associated with each of the input $k$ classes. Given covariates x and response y.
+
+
+
 
 
 
@@ -65,11 +140,7 @@ Provide more concrete details here, e.g.,
 In class we learnt how to use the `map` function to create multiple regression diagnostic plots
 
 ```{R results='hide', fig.height=4}
-par(mfcol=c(2, 3), mar=c(3.5, 3.5, 2, 1), mgp=c(2.4, 0.8, 0))
-mtcars %>%
-  split(.$cyl) %>%
-  map(~ lm(mpg ~ wt, data = .x)) %>%
-  map(function(x)plot(x, which=c(1, 2)))
+
 ```
 
 
