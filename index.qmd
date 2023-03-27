@@ -130,17 +130,107 @@ Include a _very brief_ summary of what you learnt in this class here.
 
 Today, I learnt the following concepts in class:
 
-1. Item 1
-1. Item 2
-1. Item 3
+1. Multinomial logistic regression
+1. Classification (decision) tree
+1. Support Vector Machine
 :::
 
 Provide more concrete details here, e.g., 
 
-In class we learnt how to use the `map` function to create multiple regression diagnostic plots
+```{R}
+sample(1:3, size = 1000, replace = TRUE, prob = c(0.8, 0.1,0.1))
 
-```{R results='hide', fig.height=4}
+```
 
+```{R}
+b <- c(-10,0,10)
+prob_function = \(x) exp(b*x) / sum(exp(b*x))
+```
+
+```{R}
+x <- rnorm(1000)
+y<- c()
+for(i in 1:length (x)) {
+  y[i] <-sample(0:2, 1 , prob = prob_function(x[i]))
+}
+cbind(x,y) %>% head 
+```
+
+
+
+```{R}
+df <- data.frame(x=x, y=as.factor(y))
+df$y <- relevel(df$y, ref= "1")
+df$y
+```
+
+
+```{R}
+
+model <- multinom(y ~ x,df)
+summary(model)
+```
+```{R}
+#I couldn't get the != operator to work.
+#n <- 250
+#x <- t(replicate(n,2*runif(2)-1))
+#y <- ifelse(X,1, \(x) sum(sign(x+0.01 * rnorm(2))) != 0,0,1) %>% as.factor()
+#
+#col <- ifelse(y = 0, "blue", "red")
+#plot(X[,1], X[,2], col=col, pch=19)
+```
+
+
+```{R}
+df <- data.frame(y=y, x1=X[,1], x2=X[,2])
+model <- glm(y~ x1 +x2, df, family=binomial())
+f_logistic = \(x) predict(model, data.frame(x1=x[,1], x2[,2]), type="response")
+```
+
+```{R}
+xnew <- cbind(
+  rep(seq(-1.1,1.1, length.out=50), 50),
+  rep(seq(-1.1,1.1, length.out=50), 50)
+)
+```
+
+```{R}
+plt <- function(f,x) {
+  plot(x[,1], x[,2], col=ifelse(f(x) < 50, "blue", 'red'), pch=22)
+  points(df$x1, df$x2, col =ifelse(y == 0 ))
+}
+```
+
+
+### Classification (decision) tree
+Classification trees are commonly used in machine learning to predict categorical outcomes. They are a hierarchical model that recursively partitions the data by finding splits in the variables based on the most informative features.
+
+They're very good at predicting what your categories will be. In the class examples it made some errors because it predicted blue when it was actually red. But it was only in 7 instances out of 250.
+
+### Support Vector Machine
+Were very popular before neural nets. They're useful because they're designed to construct options. They're known as maximum margin non-linear. The name of the package in r is `(e1071)`. Kernel is one of the parameters used with svm's. It has different types that can really change the result. Some of the types are: radial, polynomial, sigmoid.
+
+When compared to the decision trees, svms do smooth curves while the trees dont do that. 
+
+### Neural Network with 1 hidden Layer
+They add more linear layers inside.
+```{R}
+module <- nn_module(
+  initialize = function() {
+    self$f <- nn_linear(2,20)
+    self$f <- nn_linear(2,20) #hidden layer
+    self$f <- nn_linear(2,20) #hidden layer
+    self$f <- nn_linear(2,20) #hidden layer
+    self$g <- nn_linear(2,1)
+    self$h <- nn_sigmoid()
+  },
+  forward = function(x) {
+    x %>%
+      self$f() %>%
+      self$g() %>%
+      self$h()
+  }
+)
 ```
 
 
